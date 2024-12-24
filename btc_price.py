@@ -1,1 +1,47 @@
-aW1wb3J0IHJlcXVlc3RzCmltcG9ydCBqc29uCmZyb20gZGF0ZXRpbWUgaW1wb3J0IGRhdGV0aW1lCgpkZWYgZ2V0X2JpdGNvaW5fcHJpY2UoKToKICAgICIiIkZldGNoIGN1cnJlbnQgQml0Y29pbiBwcmljZSBmcm9tIENvaW5HZWNrbyBBUEkiIiIKICAgIHRyeToKICAgICAgICAjIENvaW5HZWNrbyBBUEkgZW5kcG9pbnQgZm9yIEJpdGNvaW4gcHJpY2UgaW4gVVNECiAgICAgICAgdXJsID0gJ2h0dHBzOi8vYXBpLmNvaW5nZWNrby5jb20vYXBpL3YzL3NpbXBsZS9wcmljZScKICAgICAgICBwYXJhbXMgPSB7CiAgICAgICAgICAgICdpZHMnOiAnYml0Y29pbicsCiAgICAgICAgICAgICd2c19jdXJyZW5jaWVzJzogJ3VzZCcsCiAgICAgICAgICAgICdpbmNsdWRlXzI0aHJfY2hhbmdlJzogJ3RydWUnCiAgICAgICAgfQogICAgICAgIAogICAgICAgICMgTWFrZSB0aGUgQVBJIHJlcXVlc3QKICAgICAgICByZXNwb25zZSA9IHJlcXVlc3RzLmdldCh1cmwsIHBhcmFtcz1wYXJhbXMpCiAgICAgICAgcmVzcG9uc2UucmFpc2VfZm9yX3N0YXR1cygpICAjIFJhaXNlIGFuIGV4Y2VwdGlvbiBmb3IgYmFkIHN0YXR1cyBjb2RlcwogICAgICAgIAogICAgICAgICMgUGFyc2UgdGhlIHJlc3BvbnNlCiAgICAgICAgZGF0YSA9IHJlc3BvbnNlLmpzb24oKQogICAgICAgIAogICAgICAgICMgRXh0cmFjdCBwcmljZSBhbmQgMjRoIGNoYW5nZQogICAgICAgIGN1cnJlbnRfcHJpY2UgPSBkYXRhWydiaXRjb2luJ11bJ3VzZCddCiAgICAgICAgcHJpY2VfY2hhbmdlID0gZGF0YVsnYml0Y29pbiddWyd1c2RfMjRoX2NoYW5nZSddCiAgICAgICAgCiAgICAgICAgcmV0dXJuIGN1cnJlbnRfcHJpY2UsIHByaWNlX2NoYW5nZQogICAgCiAgICBleGNlcHQgcmVxdWVzdHMuZXhjZXB0aW9ucy5SZXF1ZXN0RXhjZXB0aW9uIGFzIGU6CiAgICAgICAgcHJpbnQoZidFcnJvciBmZXRjaGluZyBwcmljZToge2V9JykKICAgICAgICByZXR1cm4gTm9uZSwgTm9uZQoKZGVmIG1haW4oKToKICAgICMgR2V0IGN1cnJlbnQgdGltZXN0YW1wCiAgICB0aW1lc3RhbXAgPSBkYXRldGltZS5ub3coKS5zdHJmdGltZSgnJVktJW0tJWQgJUg6JU06JVMnKQogICAgCiAgICAjIEZldGNoIEJpdGNvaW4gcHJpY2UKICAgIHByaWNlLCBjaGFuZ2UgPSBnZXRfYml0Y29pbl9wcmljZSgpCiAgICAKICAgIGlmIHByaWNlIGFuZCBjaGFuZ2U6CiAgICAgICAgcHJpbnQoZidcbkJpdGNvaW4gUHJpY2UgKHt0aW1lc3RhbXB9KScpCiAgICAgICAgcHJpbnQoJy0nICogMzApCiAgICAgICAgcHJpbnQoZidDdXJyZW50IFByaWNlOiAke3ByaWNlOiwuMmZ9JykKICAgICAgICBwcmludChmJzI0aCBDaGFuZ2U6IHtjaGFuZ2U6LjJmfSVcbicpCgppZiBfX25hbWVfXyA9PSAnX19tYWluX18nOgogICAgbWFpbigp
+import requests
+import json
+from datetime import datetime
+
+def get_bitcoin_price():
+    """Fetch current Bitcoin price from CoinGecko API"""
+    try:
+        # CoinGecko API endpoint for Bitcoin price in USD
+        url = 'https://api.coingecko.com/api/v3/simple/price'
+        params = {
+            'ids': 'bitcoin',
+            'vs_currencies': 'usd',
+            'include_24hr_change': 'true'
+        }
+        
+        # Make the API request
+        response = requests.get(url, params=params)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        
+        # Parse the response
+        data = response.json()
+        
+        # Extract price and 24h change
+        current_price = data['bitcoin']['usd']
+        price_change = data['bitcoin']['usd_24h_change']
+        
+        return current_price, price_change
+    
+    except requests.exceptions.RequestException as e:
+        print(f'Error fetching price: {e}')
+        return None, None
+
+def main():
+    # Get current timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Fetch Bitcoin price
+    price, change = get_bitcoin_price()
+    
+    if price and change:
+        print(f'\nBitcoin Price ({timestamp})')
+        print('-' * 30)
+        print(f'Current Price: ${price:,.2f}')
+        print(f'24h Change: {change:.2f}%\n')
+
+if __name__ == '__main__':
+    main()
