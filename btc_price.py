@@ -46,9 +46,23 @@ def get_current_prices():
         
         data = response.json()
         
+        # Get USD price and change (required)
         current_price_usd = data['bitcoin']['usd']
-        current_price_uyu = data['bitcoin']['uyu']
         price_change_usd = data['bitcoin'].get('usd_24h_change', 0)
+        
+        # Try to get UYU price, use converted USD price as fallback
+        try:
+            current_price_uyu = data['bitcoin'].get('uyu')
+            if current_price_uyu is None:
+                # If UYU is not available, use a fallback conversion rate (example: 1 USD = 39.5 UYU)
+                fallback_uyu_rate = 39.5
+                current_price_uyu = current_price_usd * fallback_uyu_rate
+                print("Warning: UYU price not available from API, using estimated conversion")
+        except (KeyError, TypeError):
+            # If there's any error getting UYU price, use the fallback
+            fallback_uyu_rate = 39.5
+            current_price_uyu = current_price_usd * fallback_uyu_rate
+            print("Warning: UYU price not available from API, using estimated conversion")
         
         return current_price_usd, current_price_uyu, price_change_usd
     
